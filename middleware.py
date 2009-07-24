@@ -1,15 +1,21 @@
 import sys, traceback
 import urllib2
 import yaml
+from django.core.exceptions import MiddlewareNotUsed
 from django.views.debug import get_safe_settings
 from django.conf import settings
 
 class HoptoadNotifierMiddleware(object):
     def __init__(self):
-        super(HoptoadNotifierMiddleware, self).__init__()
+        all_settings = settings.get_all_members()
+        if 'HOPTOAD_API_KEY' not in all_settings:
+            raise MiddlewareNotUsed
+        if settings.DEBUG == True and (
+            not 'HOPTOAD_NOTIFY_WHILE_DEBUG' in all_settings
+            or not settings.HOPTOAD_NOTIFY_WHILE_DEBUG ):
+            raise MiddlewareNotUsed
     
     def process_exception(self, request, exc):
-        print 'Processing!'
         excc, _, tb = sys.exc_info()
         
         message = '%s: %s' % (excc.__name__, str(exc))
