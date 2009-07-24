@@ -31,16 +31,15 @@ class HoptoadNotifierMiddleware(object):
         headers = { 'Content-Type': 'application/x-yaml', 
                     'Accept': 'text/xml, application/xml', }
         data = yaml.dump({ 'notice': {
-                'api_key':       settings.HOPTOAD_API_KEY,
-                'error_class':   excc.__name__,
-                'error_message': "%s: %s" % (excc.__name__, message),
-                'backtrace':     trace,
-                'request':       { 'url': request.build_absolute_uri(),
-                                   'params': request_post if request_post else request_get },
-                'session':       { 'key': '', 'data': session },
-                'environment':   environment,
-            }
-        }, default_flow_style=False)
+            'api_key':       settings.HOPTOAD_API_KEY,
+            'error_class':   excc.__name__,
+            'error_message': "%s: %s" % (excc.__name__, message),
+            'backtrace':     trace,
+            'request':       { 'url': request.build_absolute_uri(),
+                               'params': request_post if request_post else request_get },
+            'session':       { 'key': '', 'data': session },
+            'environment':   environment,
+        }}, default_flow_style=False)
         
         print data
         
