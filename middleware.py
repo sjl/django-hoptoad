@@ -10,7 +10,7 @@ class HoptoadNotifierMiddleware(object):
         all_settings = settings.get_all_members()
         if 'HOPTOAD_API_KEY' not in all_settings:
             raise MiddlewareNotUsed
-        if settings.DEBUG == True and (
+        if settings.DEBUG and (
             not 'HOPTOAD_NOTIFY_WHILE_DEBUG' in all_settings
             or not settings.HOPTOAD_NOTIFY_WHILE_DEBUG ):
             raise MiddlewareNotUsed
