@@ -10,12 +10,17 @@ class HoptoadNotifierMiddleware(object):
     
     def process_exception(self, request, exc):
         print 'Processing!'
-        excc, _, trace = sys.exc_info()
+        excc, _, tb = sys.exc_info()
         
-        message = str(exc)
-        trace = [line.strip() for line in traceback.format_tb(trace)]
-        environment = dict( (k, str(v)) for (k, v) in get_safe_settings().items() )
-        request_get = dict( (k, str(v)) for (k, v) in request.GET.items() )
+        message = '%s: %s' % (excc.__name__, str(exc))
+        trace = [ "%s:%d:in `%s'" % (filename, lineno, funcname) 
+                  for filename, lineno, funcname, _
+                  in traceback.extract_tb(tb) ]
+        trace.reverse()
+        environment = dict( (str(k), str(v)) for (k, v) in get_safe_settings().items() )
+        request_get = dict( (str(k), str(v)) for (k, v) in request.GET.items() )
+        request_post = dict( (str(k), str(v)) for (k, v) in request.POST.items() )
+        session = dict( (str(k), str(v)) for (k, v) in request.session.items() )
         
         headers = { 'Content-Type': 'application/x-yaml', 
                     'Accept': 'text/xml, application/xml', }
@@ -25,13 +30,16 @@ class HoptoadNotifierMiddleware(object):
                 'error_message': "%s: %s" % (excc.__name__, message),
                 'backtrace':     trace,
                 'request':       { 'url': request.build_absolute_uri(),
-                                   'params': request_get },
-                'session':       {},
+                                   'params': request_post if request_post else request_get },
+                'session':       { 'key': '', 'data': session },
                 'environment':   environment,
             }
-        })
+        }, default_flow_style=False)
+        
+        print data
+        
         r = urllib2.Request('http://hoptoadapp.com/notices', data, headers)
-        print '\n'.join(l for l in urllib2.urlopen(r))
+        urllib2.urlopen(r)
         
         return None
     
