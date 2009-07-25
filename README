@@ -56,9 +56,30 @@ Next, you'll need to add a `HOPTOAD_API_KEY` setting.  You can get the key from 
 
     HOPTOAD_API_KEY = 'Your Hoptoad API key.'
 
+Optional Settings
+-----------------
+
+There are a few extra things you can configure if you'd like to tweak the notification process a bit.
+
+### Notify Hoptoad While in `DEBUG` Mode
+
 By default the Middleware will **not** report errors to Hoptoad when your project is in `DEBUG` mode.  The idea behind this is that if you can already see the error information right in the browser you probably don't need to see it in Hoptoad too.  If you want to always notify Hoptoad of errors, even while in `DEBUG` mode, add the following setting:
 
     HOPTOAD_NOTIFY_WHILE_DEBUG = True
+
+### Specify a Default Timeout
+
+The notification middleware will make sure the error notification gets to Hoptoad before the response gets sent back to the user.  If it takes a while to contact Hoptoad the user will notice a delay.
+
+By default, the amount of time the notifier will wait before giving up is Python's "global default timeout setting".  I have no idea what that is because the [documentation][urllib2docs] does not see fit to explain that to me.
+
+If you'd like to change that amount you can use the `HOPTOAD_TIMEOUT` setting.  You **must** be running Python2.6+ to use this.
+
+    HOPTOAD_TIMEOUT = 5
+
+The number is the number of seconds the notifier will wait before timing out.  Yes, you can use a float like `0.5` to specify fractions of a second.
+
+[urllib2docs]: http://docs.python.org/library/urllib2.html
 
 Suggestions
 -----------
