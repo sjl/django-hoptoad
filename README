@@ -61,7 +61,7 @@ Optional Settings
 
 There are a few extra things you can configure if you'd like to tweak the notification process a bit.
 
-### Notify Hoptoad While in `DEBUG` Mode
+### Notify Hoptoad While in DEBUG Mode
 
 By default the Middleware will **not** report errors to Hoptoad when your project is in `DEBUG` mode.  The idea behind this is that if you can already see the error information right in the browser you probably don't need to see it in Hoptoad too.  If you want to always notify Hoptoad of errors, even while in `DEBUG` mode, add the following setting:
 
