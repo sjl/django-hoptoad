@@ -40,9 +40,7 @@ class HoptoadNotifierMiddleware(object):
             'session':       { 'key': '', 'data': session },
             'environment':   environment,
         }}, default_flow_style=False)
-        
-        print data
-        
+                
         r = urllib2.Request('http://hoptoadapp.com/notices', data, headers)
         urllib2.urlopen(r)
         
