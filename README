@@ -81,6 +81,17 @@ The number is the number of seconds the notifier will wait before timing out.  Y
 
 [urllib2docs]: http://docs.python.org/library/urllib2.html
 
+### Tracking 404 Errors
+
+By default Hoptoad will **not** be notified of 404 (page not found) errors.  If you'd like to change this you'll need to add the following setting:
+
+    HOPTOAD_NOTIFY_404 = True
+
+A couple of things to note:
+
+* If your website doesn't have a favicon specified most browsers will request it each time.  This will result in one (or possibly two, if it tries to append a slash) 404 errors for every page view.
+* At the moment all 404 errors are grouped together as "similar" errors in Hoptoad.  I am trying to figure out what causes this.
+
 Suggestions
 -----------
 
