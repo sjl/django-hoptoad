@@ -56,7 +56,7 @@ Next, you'll need to add a `HOPTOAD_API_KEY` setting.  You can get the key from 
 
     HOPTOAD_API_KEY = 'Your Hoptoad API key.'
 
-By default the Middleware will **not** report errors to Hoptoad when your project is in `DEBUG` mode.  The idea behind this is that you if can already see the error information right in the browser you probably don't need to see it in Hoptoad too.  If you want to always notify Hoptoad of errors, even while in `DEBUG` mode, add the following setting:
+By default the Middleware will **not** report errors to Hoptoad when your project is in `DEBUG` mode.  The idea behind this is that if you can already see the error information right in the browser you probably don't need to see it in Hoptoad too.  If you want to always notify Hoptoad of errors, even while in `DEBUG` mode, add the following setting:
 
     HOPTOAD_NOTIFY_WHILE_DEBUG = True
 
