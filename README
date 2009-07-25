@@ -87,6 +87,16 @@ By default Hoptoad will **not** be notified of 404 (page not found) errors.  If 
 
     HOPTOAD_NOTIFY_404 = True
 
+**IMPORTANT**: If you are using Django's `flatpages` app and want to track 404 errors, you need to make sure the `FlatpageFallbackMiddleware` comes *after* the `HoptoadNotifierMiddleware`.  If you don't do this Hoptoad will be notified of 404 errors even if the user actually sees a Flatpage.
+
+To track 404s while using the `flatpages` app your `MIDDLEWARE_CLASSES` setting should look like this:
+
+    MIDDLEWARE_CLASSES = (
+        # ... other middleware classes ...
+        'hoptoad.middleware.HoptoadNotifierMiddleware',
+        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    )
+
 A couple of things to note:
 
 * If your website doesn't have a favicon specified most browsers will request it each time.  This will result in one (or possibly two, if it tries to append a slash) 404 errors for every page view.
