@@ -66,7 +66,7 @@ class HoptoadNotifierMiddleware(object):
         headers = { 'Content-Type': 'application/x-yaml', 
                     'Accept': 'text/xml, application/xml', }
         data = _generate_payload(exc, excc, tb, request)
-                
+        
         r = urllib2.Request('http://hoptoadapp.com/notices', data, headers)
         if not self.timeout:
             try:
