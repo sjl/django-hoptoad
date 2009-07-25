@@ -5,6 +5,47 @@ from django.core.exceptions import MiddlewareNotUsed
 from django.views.debug import get_safe_settings
 from django.conf import settings
 
+def _parse_environment():
+    return dict( (str(k), str(v)) for (k, v) in get_safe_settings().items() )
+
+def _parse_traceback(tb):
+    tb = [ "%s:%d:in `%s'" % (filename, lineno, funcname) 
+                  for filename, lineno, funcname, _
+                  in traceback.extract_tb(tb) ]
+    tb.reverse()
+    return tb
+
+def _parse_message(exc, exc_class):
+    return '%s: %s' % (exc_class.__name__, str(exc))
+
+def _parse_request(request):
+    request_get = dict( (str(k), str(v)) for (k, v) in request.GET.items() )
+    request_post = dict( (str(k), str(v)) for (k, v) in request.POST.items() )
+    return request_post if request_post else request_get
+
+def _parse_session(session):
+    return dict( (str(k), str(v)) for (k, v) in session.items() )
+
+
+def _generate_payload(exc, excc, tb, request):
+    message = _parse_message(exc, excc)
+    traceback = _parse_traceback(tb)
+    environment = _parse_environment()
+    req = _parse_request(request)
+    session = _parse_session(request.session)
+    
+    return yaml.dump({ 'notice': {
+        'api_key':       settings.HOPTOAD_API_KEY,
+        'error_class':   excc.__name__,
+        'error_message': message,
+        'backtrace':     traceback,
+        'request':       { 'url': request.build_absolute_uri(),
+                           'params': req },
+        'session':       { 'key': '', 'data': session },
+        'environment':   environment,
+    }}, default_flow_style=False)
+
+
 class HoptoadNotifierMiddleware(object):
     def __init__(self):
         all_settings = settings.get_all_members()
@@ -22,28 +63,9 @@ class HoptoadNotifierMiddleware(object):
     def process_exception(self, request, exc):
         excc, _, tb = sys.exc_info()
         
-        message = '%s: %s' % (excc.__name__, str(exc))
-        trace = [ "%s:%d:in `%s'" % (filename, lineno, funcname) 
-                  for filename, lineno, funcname, _
-                  in traceback.extract_tb(tb) ]
-        trace.reverse()
-        environment = dict( (str(k), str(v)) for (k, v) in get_safe_settings().items() )
-        request_get = dict( (str(k), str(v)) for (k, v) in request.GET.items() )
-        request_post = dict( (str(k), str(v)) for (k, v) in request.POST.items() )
-        session = dict( (str(k), str(v)) for (k, v) in request.session.items() )
-        
         headers = { 'Content-Type': 'application/x-yaml', 
                     'Accept': 'text/xml, application/xml', }
-        data = yaml.dump({ 'notice': {
-            'api_key':       settings.HOPTOAD_API_KEY,
-            'error_class':   excc.__name__,
-            'error_message': "%s: %s" % (excc.__name__, message),
-            'backtrace':     trace,
-            'request':       { 'url': request.build_absolute_uri(),
-                               'params': request_post if request_post else request_get },
-            'session':       { 'key': '', 'data': session },
-            'environment':   environment,
-        }}, default_flow_style=False)
+        data = _generate_payload(exc, excc, tb, request)
                 
         r = urllib2.Request('http://hoptoadapp.com/notices', data, headers)
         if not self.timeout:
