@@ -73,7 +73,7 @@ The notification middleware will make sure the error notification gets to Hoptoa
 
 By default, the amount of time the notifier will wait before giving up is Python's "global default timeout setting".  I have no idea what that is because the [documentation][urllib2docs] does not see fit to explain that to me.
 
-If you'd like to change that amount you can use the `HOPTOAD_TIMEOUT` setting.  You **must** be running Python2.6+ to use this.
+If you'd like to change that amount you can use the `HOPTOAD_TIMEOUT` setting.  You **must** be running Python 2.6+ to use this.
 
     HOPTOAD_TIMEOUT = 5
 
