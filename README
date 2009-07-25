@@ -1,0 +1,68 @@
+-*- markdown -*-
+
+django-hoptoad
+==============
+
+django-hoptoad is some simple Middleware for letting [Django][]-driven websites report their errors to [Hoptoad][].  Now [ponies][] can ride the toad too.
+
+[Django]: http://djangoproject.com/
+[Hoptoad]: http://hoptoadapp.com/
+[ponies]: http://djangopony.com/
+
+Requirements
+------------
+
+django-hoptoad requires:
+
+* [Python][] 2.4+ (preferably 2.6+ as that's what I've tested it with)
+* [PyYAML][] (`pip install pyyaml` or `easy_install pyyaml`)
+* [Django][] 1.0+
+* A [Hoptoad][] account
+
+[Python]: http://python.org/
+[PyYAML]: http://pyyaml.org/
+
+Installation
+------------
+
+Grab the the django-hoptoad code by cloning the [Mercurial][] repository (or just [download the latest version][tip-dl] and unzip it somewhere.):
+
+    hg clone http://bitbucket.org/sjl/django-hoptoad/
+
+Once you download it, symlink the module into your `site-packages` directory:
+
+    ln -s /full/path/to/django-hoptoad/hoptoad /full/path/to/site-packages/
+
+To make sure it works you can run:
+
+    python -c 'import hoptoad'
+
+[Mercurial]: http://mercurial.selenic.com/
+[tip-dl]: http://bitbucket.org/sjl/django-hoptoad/get/tip.zip
+
+Usage
+-----
+
+To set up a Django project to notify Hoptoad of its errors, you need to do two things in the `settings.py` file.
+
+First, add the `HoptoadNotifierMiddleware` as the last item in your `MIDDLEWARE_CLASSES` setting:
+
+    MIDDLEWARE_CLASSES = (
+        # ... other middleware classes ...
+        'hoptoad.middleware.HoptoadNotifierMiddleware',
+    )
+
+Next, you'll need to add a `HOPTOAD_API_KEY` setting.  You can get the key from the Hoptoad project page.
+
+    HOPTOAD_API_KEY = 'Your Hoptoad API key.'
+
+By default the Middleware will **not** report errors to Hoptoad when your project is in `DEBUG` mode.  The idea behind this is that you if can already see the error information right in the browser you probably don't need to see it in Hoptoad too.  If you want to always notify Hoptoad of errors, even while in `DEBUG` mode, add the following setting:
+
+    HOPTOAD_NOTIFY_WHILE_DEBUG = True
+
+Suggestions
+-----------
+
+This Middleware is a work in progress.  If you have a suggestion or find a bug please [add an issue][issues] and let me know.
+
+[issues]: http://bitbucket.org/sjl/django-hoptoad/issues/?status=new&status=open
