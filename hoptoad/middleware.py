@@ -14,6 +14,10 @@ class HoptoadNotifierMiddleware(object):
             not 'HOPTOAD_NOTIFY_WHILE_DEBUG' in all_settings
             or not settings.HOPTOAD_NOTIFY_WHILE_DEBUG ):
             raise MiddlewareNotUsed
+        if 'HOPTOAD_TIMEOUT' not in all_settings:
+            self.timeout = None
+        else:
+            self.timeout = settings.HOPTOAD_TIMEOUT
     
     def process_exception(self, request, exc):
         excc, _, tb = sys.exc_info()
@@ -42,7 +46,16 @@ class HoptoadNotifierMiddleware(object):
         }}, default_flow_style=False)
                 
         r = urllib2.Request('http://hoptoadapp.com/notices', data, headers)
-        urllib2.urlopen(r)
+        if not self.timeout:
+            try:
+                urllib2.urlopen(r)
+            except urllib2.URLError:
+                pass
+        else:
+            try:
+                urllib2.urlopen(r, timeout=self.timeout)
+            except urllib2.URLError:
+                pass
         
         return None
     
