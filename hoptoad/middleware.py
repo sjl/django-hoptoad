@@ -31,6 +31,22 @@ def _parse_session(session):
 
 
 def _generate_payload(req, exc=None, excc=None, tb=None, mess=None, err_class=None):
+    """Generate a YAML payload for a Hoptoad notification.
+    
+    Parameters:
+    req -- A Django HTTPRequest.  This is required.
+    
+    Keyword parameters:
+    exc -- A Python Exception object.  If this is not given the 
+           mess parameter must be.
+    excc -- A Python class object representing the exception class.  If
+            this is not given the err_class parameter must be.
+    tb -- A Python Traceback object.  This is not required.
+    mess -- A string representing the error message.  If this is not
+            given, the exc parameter must be.
+    err_class -- A string representing the error class.  If this is not
+                 given the excc parameter must be.
+    """
     message = mess if mess else _parse_message(exc, excc)
     error_class = err_class if err_class else excc.__name__
     traceback = _parse_traceback(tb) if tb else []
@@ -50,6 +66,12 @@ def _generate_payload(req, exc=None, excc=None, tb=None, mess=None, err_class=No
     }}, default_flow_style=False)
 
 def _ride_the_toad(payload, timeout):
+    """Send a notification (an HTTP POST request) to Hoptoad.
+    
+    Parameters:
+    payload -- the YAML payload for the request from _generate_payload()
+    timeout -- the maximum timeout, in seconds, or None to use the default
+    """
     headers = { 'Content-Type': 'application/x-yaml', 
                 'Accept': 'text/xml, application/xml', }
     r = urllib2.Request('http://hoptoadapp.com/notices', payload, headers)
@@ -64,6 +86,7 @@ def _ride_the_toad(payload, timeout):
 
 class HoptoadNotifierMiddleware(object):
     def __init__(self):
+        """Initialize the middleware."""
         all_settings = settings.get_all_members()
         
         if 'HOPTOAD_API_KEY' not in all_settings:
@@ -81,6 +104,14 @@ class HoptoadNotifierMiddleware(object):
                             if 'HOPTOAD_NOTIFY_404' in all_settings else False )
     
     def process_response(self, request, response):
+        """Process a reponse object.
+        
+        Hoptoad will be notified of a 404 error if the response is a 404
+        and 404 tracking is enabled in the settings.
+        
+        Regardless of whether Hoptoad is notified, the reponse object will
+        be returned unchanged.
+        """
         if self.notify_404 and response.status_code == 404:
             error_class = 'Http404'
             
@@ -92,6 +123,12 @@ class HoptoadNotifierMiddleware(object):
         return response
     
     def process_exception(self, request, exc):
+        """Process an exception.
+        
+        Hoptoad will be notified of the exception and None will be
+        returned so that Django's normal exception handling will then
+        be used.
+        """
         excc, _, tb = sys.exc_info()
         
         payload = _generate_payload(request, exc, excc, tb)
