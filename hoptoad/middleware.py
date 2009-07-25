@@ -74,15 +74,11 @@ class HoptoadNotifierMiddleware(object):
             or not settings.HOPTOAD_NOTIFY_WHILE_DEBUG ):
             raise MiddlewareNotUsed
         
-        if 'HOPTOAD_TIMEOUT' in all_settings:
-            self.timeout = settings.HOPTOAD_TIMEOUT
-        else:
-            self.timeout = None
+        self.timeout = ( settings.HOPTOAD_TIMEOUT 
+                         if 'HOPTOAD_TIMEOUT' in all_settings else None )
         
-        if 'HOPTOAD_NOTIFY_404' in all_settings:
-            self.notify_404 = settings.HOPTOAD_NOTIFY_404
-        else:
-            self.notify_404 = False
+        self.notify_404 = ( settings.HOPTOAD_NOTIFY_404 
+                            if 'HOPTOAD_NOTIFY_404' in all_settings else False )
     
     def process_response(self, request, response):
         if self.notify_404 and response.status_code == 404:
