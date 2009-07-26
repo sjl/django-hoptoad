@@ -103,12 +103,17 @@ class HoptoadNotifierMiddleware(object):
         
         self.notify_404 = ( settings.HOPTOAD_NOTIFY_404 
                             if 'HOPTOAD_NOTIFY_404' in all_settings else False )
+        self.notify_403 = ( settings.HOPTOAD_NOTIFY_403 
+                            if 'HOPTOAD_NOTIFY_403' in all_settings else False )
     
     def process_response(self, request, response):
         """Process a reponse object.
         
         Hoptoad will be notified of a 404 error if the response is a 404
         and 404 tracking is enabled in the settings.
+        
+        Hoptoad will be notified of a 403 error if the response is a 403
+        and 403 tracking is enabled in the settings.
         
         Regardless of whether Hoptoad is notified, the reponse object will
         be returned unchanged.
@@ -117,7 +122,15 @@ class HoptoadNotifierMiddleware(object):
             error_class = 'Http404'
             
             message = 'Http404: Page not found at %s' % request.build_absolute_uri()
-            payload = _generate_payload(request, err_class=error_class, mess=message)
+            payload = _generate_payload(request, error_class=error_class, message=message)
+            
+            _ride_the_toad(payload, self.timeout)
+        
+        if self.notify_403 and response.status_code == 403:
+            error_class = 'Http403'
+            
+            message = 'Http403: Forbidden at %s' % request.build_absolute_uri()
+            payload = _generate_payload(request, error_class=error_class, message=message)
             
             _ride_the_toad(payload, self.timeout)
         
