@@ -14,7 +14,7 @@ Requirements
 
 django-hoptoad requires:
 
-* [Python][] 2.4+ (preferably 2.6+ as that's what I've tested it with)
+* [Python][] 2.5+ (preferably 2.6+ as that's what I've tested it with)
 * [PyYAML][] (`pip install pyyaml` or `easy_install pyyaml`)
 * [Django][] 1.0+
 * A [Hoptoad][] account
