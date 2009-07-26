@@ -25,7 +25,7 @@ django-hoptoad requires:
 Installation
 ------------
 
-Grab the the django-hoptoad code by cloning the [Mercurial][] repository (or just [download the latest version][tip-dl] and unzip it somewhere.):
+Grab the the django-hoptoad code by cloning the [Mercurial][] repository (or just [download the latest version][tip-dl] and unzip it somewhere):
 
     hg clone http://bitbucket.org/sjl/django-hoptoad/
 
