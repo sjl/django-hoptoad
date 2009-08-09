@@ -54,7 +54,7 @@ def _generate_payload(request, exc=None, trace=None, message=None, error_class=N
     p_environment = _parse_environment(request)
     p_request = _parse_request(request)
     p_session = _parse_session(request.session)
-    print p_error_class
+    
     return yaml.dump({ 'notice': {
         'api_key':       settings.HOPTOAD_API_KEY,
         'error_class':   p_error_class,
