@@ -81,7 +81,7 @@ The number is the number of seconds the notifier will wait before timing out.  Y
 
 [urllib2docs]: http://docs.python.org/library/urllib2.html
 
-### Tracking 404 Errors
+### Track 404 Errors
 
 By default Hoptoad will **not** be notified of 404 (page not found) errors.  If you'd like to change this you'll need to add the following setting:
 
@@ -102,7 +102,7 @@ A couple of things to note:
 * If your website doesn't have a favicon specified most browsers will request it each time.  This will result in one (or possibly two, if it tries to append a slash) 404 errors for every page view.
 * At the moment all 404 errors are grouped together as "similar" errors in Hoptoad.  I am trying to figure out what causes this.
 
-### Tracking 403 Errors
+### Track 403 Errors
 
 By default Hoptoad will **not** be notified of 403 (forbidden) errors.  If you'd like to change this you'll need to add the following setting:
 
@@ -111,6 +111,24 @@ By default Hoptoad will **not** be notified of 403 (forbidden) errors.  If you'd
 Note:
 
 * At the moment all 403 errors are grouped together as "similar" errors in Hoptoad.  I am trying to figure out what causes this.
+
+### Ignore Specific User Agents
+
+If you'd like to ignore all errors from certain User Agents you can use the following setting:
+
+    HOPTOAD_IGNORE_AGENTS = ['MSIE 6.0', 'Trident']
+
+If any of the strings in the list appear *anywhere* in the User Agent string, Hoptoad will not be notified of the error.
+
+The strings are actually regular expressions, so you can be more specific if you like:
+
+    HOPTOAD_IGNORE_AGENTS = [r'^Mozilla.*compatible; MSIE \d+\.\d+.*$']
+
+One thing this is useful for (aside from hating on IE) is ignoring errors from web crawlers.  Often bots will mangle URLs and if you're tracking 404 errors you'll see a *lot* of errors that you probably don't care about.
+
+This would probably be a good starting point for ignoring crawlers:
+
+    HOPTOAD_IGNORE_AGENTS = ['Googlebot', 'Yahoo! Slurp', 'YahooSeeker']
 
 Troubleshooting
 ---------------
