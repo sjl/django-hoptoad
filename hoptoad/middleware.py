@@ -1,6 +1,7 @@
 import sys, traceback
 import urllib2
 import yaml
+import re
 from django.core.exceptions import MiddlewareNotUsed
 from django.views.debug import get_safe_settings
 from django.conf import settings
@@ -105,6 +106,13 @@ class HoptoadNotifierMiddleware(object):
                             if 'HOPTOAD_NOTIFY_404' in all_settings else False )
         self.notify_403 = ( settings.HOPTOAD_NOTIFY_403 
                             if 'HOPTOAD_NOTIFY_403' in all_settings else False )
+        self.ignore_agents = ( map(re.compile, settings.HOPTOAD_IGNORE_AGENTS)
+                            if 'HOPTOAD_IGNORE_AGENTS' in all_settings else [] )
+    
+    def _ignore(self, request):
+        """Return True if the given request should be ignored, False otherwise."""
+        user_agent = request.META['HTTP_USER_AGENT']
+        return any(i.search(user_agent) for i in self.ignore_agents)
     
     def process_response(self, request, response):
         """Process a reponse object.
@@ -118,6 +126,9 @@ class HoptoadNotifierMiddleware(object):
         Regardless of whether Hoptoad is notified, the reponse object will
         be returned unchanged.
         """
+        if self._ignore(request):
+            return response
+        
         if self.notify_404 and response.status_code == 404:
             error_class = 'Http404'
             
@@ -143,6 +154,9 @@ class HoptoadNotifierMiddleware(object):
         returned so that Django's normal exception handling will then
         be used.
         """
+        if self._ignore(request):
+            return None
+        
         excc, _, tb = sys.exc_info()
         
         payload = _generate_payload(request, exc, tb)
