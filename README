@@ -29,6 +29,10 @@ Grab the the django-hoptoad code by cloning the [Mercurial][] repository (or jus
 
     hg clone http://bitbucket.org/sjl/django-hoptoad/
 
+There's a git mirror too if you *really* want it.
+
+    git clone git://github.com/sjl/django-hoptoad.git
+
 Once you download it, symlink the module into your `site-packages` directory:
 
     ln -s /full/path/to/django-hoptoad/hoptoad /full/path/to/site-packages/
