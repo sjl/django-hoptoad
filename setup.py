@@ -9,6 +9,7 @@ setup(
     author_email='steve@stevelosh.com',
     url='http://stevelosh.com/projects/django-hoptoad/',
     packages=find_packages(),
+    requires='pyyaml',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
