@@ -111,14 +111,8 @@ class HoptoadNotifierMiddleware(object):
     
     def _ignore(self, request):
         """Return True if the given request should be ignored, False otherwise."""
-        if 'HTTP_USER_AGENT' in request.META:
-            user_agent = request.META['HTTP_USER_AGENT']
-        else:
-            user_agent = None
-        if user_agent:
-            return any(i.search(user_agent) for i in self.ignore_agents)
-        else:
-            return False
+        ua = request.META['HTTP_USER_AGENT'] if 'HTTP_USER_AGENT' in request.META else ''
+        return any(i.search(ua) for i in self.ignore_agents)
     
     def process_response(self, request, response):
         """Process a reponse object.
