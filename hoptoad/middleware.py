@@ -7,6 +7,7 @@ from django.views.debug import get_safe_settings
 from django.conf import settings
 
 def _parse_environment(request):
+    """Return an environment mapping for a notification from the given request."""
     env = dict( (str(k), str(v)) for (k, v) in get_safe_settings().items() )
     env.update( dict( (str(k), str(v)) for (k, v) in request.META.items() ) )
     
@@ -15,6 +16,7 @@ def _parse_environment(request):
     return env
 
 def _parse_traceback(trace):
+    """Return the given traceback string formatted for a notification."""
     p_traceback = [ "%s:%d:in `%s'" % (filename, lineno, funcname) 
                     for filename, lineno, funcname, _
                     in traceback.extract_tb(trace) ]
@@ -23,14 +25,17 @@ def _parse_traceback(trace):
     return p_traceback
 
 def _parse_message(exc):
+    """Return a message for a notification from the given exception."""
     return '%s: %s' % (exc.__class__.__name__, str(exc))
 
 def _parse_request(request):
+    """Return a request mapping for a notification from the given request."""
     request_get = dict( (str(k), str(v)) for (k, v) in request.GET.items() )
     request_post = dict( (str(k), str(v)) for (k, v) in request.POST.items() )
     return request_post if request_post else request_get
 
 def _parse_session(session):
+    """Return a request mapping for a notification from the given session."""
     return dict( (str(k), str(v)) for (k, v) in session.items() )
 
 
