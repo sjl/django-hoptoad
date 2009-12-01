@@ -103,12 +103,13 @@ def _ride_the_toad(payload, timeout):
         pass
 
 def _exception_handler(request, exc_info):
-    """Rudimentary exception handler, simply logs and moves on."""
+    """Rudimentary exception handler, simply logs and moves on. If there's no
+    tuple, it means something went really wrong. Critically log and exit."""
     if not isinstance(exc_info, tuple):
         # Something is seriously wrong...
         logger.critical(str(request))
         logger.critical(str(exc_info))
-        raise SystemExit
+        sys.exit(1)
     logger.warn("**** Exception occured in request #%s: %s" % \
                 (request.requestID, exc_info))
 
@@ -127,7 +128,11 @@ class Runnable(threading.Thread):
         self.daemon = True #daemon thread..important!
         self.pool = ThreadPool(self.threads)
 
-    def enqueue(self, payload, timeout, callback=None, exc_callback=_infodump):
+    def enqueue(self, 
+                payload, 
+                timeout, 
+                callback=None, 
+                exc_callback=_exception_handler):
         #create the worker request
         request = WorkRequest(_ride_the_toad, 
                               args=(payload, timeout), 
@@ -143,7 +148,7 @@ class Runnable(threading.Thread):
         """
         while True:
             try:
-                time.sleep(0.5) #configure?
+                time.sleep(0.5) #TODO: configure for tuning
                 self.pool.poll()
             except KeyboardInterrupt:
                 logger.info("***** Interrupted!")
@@ -247,5 +252,4 @@ class HoptoadNotifierMiddleware(object):
         self.thread.enqueue(payload, self.timeout)
         
         return None
-    
 
