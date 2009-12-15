@@ -94,7 +94,7 @@ def _ride_the_toad(payload, timeout):
 class HoptoadNotifierMiddleware(object):
     def __init__(self):
         """Initialize the middleware."""
-        all_settings = settings.get_all_members()
+        all_settings = dir(settings)
         
         if 'HOPTOAD_API_KEY' not in all_settings or not settings.HOPTOAD_API_KEY:
             raise MiddlewareNotUsed
