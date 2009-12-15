@@ -103,58 +103,58 @@ def _ride_the_toad(payload, timeout):
         pass
 
 def _exception_handler(request, exc_info):
-    """Rudimentary exception handler, simply logs and moves on. If there's no
-    tuple, it means something went really wrong. Critically log and exit."""
+    """Rudimentary exception handler, simply log and moves on.
+    
+    If there's no tuple, it means something went really wrong. Critically log
+    and exit.
+    """
     if not isinstance(exc_info, tuple):
-        # Something is seriously wrong...
         logger.critical(str(request))
         logger.critical(str(exc_info))
         sys.exit(1)
-    logger.warn("**** Exception occured in request #%s: %s" % \
+    logger.warn("**** Exception occured in request #%s: %s" %
                 (request.requestID, exc_info))
 
 
 class Runnable(threading.Thread):
-    """A daemon thread that spawns a threadpool of worker threads and waits
-    for queue additions through the enqueue method. 
+    """A daemon thread that spawns a threadpool of worker threads.
     
-    #TODO: Consider using asyncore instead of a threadpool
+    Waits for queue additions through the enqueue method.
+    
+    # TODO: Consider using asyncore instead of a threadpool
     """
     def __init__(self, threadpool_threadcount):
         threading.Thread.__init__(self,
-                                  name="HoptoadThreadRunner-%d" % os.getpid()) 
-
+            name="HoptoadThreadRunner-%d" % os.getpid())
+        
         self.threads = threadpool_threadcount
-        self.daemon = True #daemon thread..important!
+        self.daemon = True # daemon thread... important!
         self.pool = ThreadPool(self.threads)
-
-    def enqueue(self, 
-                payload, 
-                timeout, 
-                callback=None, 
-                exc_callback=_exception_handler):
-        #create the worker request
-        request = WorkRequest(_ride_the_toad, 
-                              args=(payload, timeout), 
-                              callback=callback,
-                              exc_callback=exc_callback)
-        #put the request into the queue where the detached 'run' method will
-        #poll its queue every 0.5 seconds and start working
+    
+    def enqueue(self, payload, timeout, callback=None, exc_callback=_exception_handler):
+        request = WorkRequest(
+            _ride_the_toad,
+            args=(payload, timeout),
+            callback=callback,
+            exc_callback=exc_callback
+        )
+        
+        # Put the request into the queue where the detached 'run' method will
+        # poll its queue every 0.5 seconds and start working.
         self.pool.putRequest(request)
-
+    
     def run(self):
-        """Executed when .start() is invoked on Runnable. Actively polls the
-        queue for requests and processes them.
-        """
+        """Actively poll the queue for requests and process them."""
         while True:
             try:
-                time.sleep(0.5) #TODO: configure for tuning
+                time.sleep(0.5) # TODO: configure for tuning
                 self.pool.poll()
             except KeyboardInterrupt:
                 logger.info("***** Interrupted!")
                 break
             except NoResultsPending:
                 pass
+    
 
 class HoptoadNotifierMiddleware(object):
     def __init__(self):
@@ -179,27 +179,28 @@ class HoptoadNotifierMiddleware(object):
         self.ignore_agents = ( map(re.compile, settings.HOPTOAD_IGNORE_AGENTS)
                             if 'HOPTOAD_IGNORE_AGENTS' in all_settings else [] )
             
-        #creates a self.thread attribute and starts it
+        # Creates a self.thread attribute and starts it.
         self.initialize_threadpool(all_settings)
-  
+    
     def _ignore(self, request):
         """Return True if the given request should be ignored, False otherwise."""
         ua = request.META.get('HTTP_USER_AGENT', '')
         return any(i.search(ua) for i in self.ignore_agents)
-        
+    
     def initialize_threadpool(self, all_settings):
-        """Initialize an internal threadpool for allowing asynchronous POST
-        requests to hoptoad. Create a thread attribute and start the threadpool
+        """Initialize an internal threadpool asynchronous POST requests.
+        
+        Also creates a thread attribute and starts the threadpool.
         """
-
+        
         if 'HOPTOAD_THREAD_COUNT' in all_settings:
             threads = settings.HOPTOAD_THREAD_COUNT
         else:
             threads = 4
-
-        self.thread = Runnable(threads) 
+        
+        self.thread = Runnable(threads)
         self.thread.start()
-
+    
     def process_response(self, request, response):
         """Process a reponse object.
         
@@ -221,7 +222,6 @@ class HoptoadNotifierMiddleware(object):
             message = 'Http404: Page not found at %s' % request.build_absolute_uri()
             payload = _generate_payload(request, error_class=error_class, message=message)
             
-            #_ride_the_toad(payload, self.timeout)
             self.thread.enqueue(payload, self.timeout)
         
         if self.notify_403 and response.status_code == 403:
@@ -230,7 +230,6 @@ class HoptoadNotifierMiddleware(object):
             message = 'Http403: Forbidden at %s' % request.build_absolute_uri()
             payload = _generate_payload(request, error_class=error_class, message=message)
             
-            #_ride_the_toad(payload, self.timeout)
             self.thread.enqueue(payload, self.timeout)
         
         return response
@@ -248,7 +247,6 @@ class HoptoadNotifierMiddleware(object):
         excc, _, tb = sys.exc_info()
         
         payload = _generate_payload(request, exc, tb)
-        #_ride_the_toad(payload, self.timeout)
         self.thread.enqueue(payload, self.timeout)
         
         return None
