@@ -112,8 +112,9 @@ def _exception_handler(request, exc_info):
         logger.critical(str(request))
         logger.critical(str(exc_info))
         sys.exit(1)
-    logger.warn("**** Exception occured in request #%s: %s" %
-                (request.requestID, exc_info))
+    logger.warn(
+        "* Exception occured in request #%s: %s" % (request.requestID, exc_info)
+    )
 
 
 class Runnable(threading.Thread):
@@ -150,7 +151,7 @@ class Runnable(threading.Thread):
                 time.sleep(0.5) # TODO: configure for tuning
                 self.pool.poll()
             except KeyboardInterrupt:
-                logger.info("***** Interrupted!")
+                logger.info("* Interrupted!")
                 break
             except NoResultsPending:
                 pass
