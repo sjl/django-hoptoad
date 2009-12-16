@@ -1,0 +1,21 @@
+Quick Start
+===========
+
+To set up a Django project to notify Hoptoad of its errors, you need to do two things in its `settings.py` file.
+
+First, add the `HoptoadNotifierMiddleware` as the last item in the `MIDDLEWARE_CLASSES` setting:
+
+    MIDDLEWARE_CLASSES = (
+        # ... other middleware classes ...
+        'hoptoad.middleware.HoptoadNotifierMiddleware',
+    )
+
+Next, you'll need to add a `HOPTOAD_API_KEY` setting.  You can get the key from the Hoptoad project page.
+
+    HOPTOAD_API_KEY = 'Your Hoptoad API key.'
+
+Restart the server and you're all set!  `django-hoptoad` will begin reporting errors to Hoptoad right away.
+
+There are a few options that you can configure to specify exactly what errors will be reported.  Take a look at the [Configuration guide][config] to learn about them.
+
+[config]: /config/

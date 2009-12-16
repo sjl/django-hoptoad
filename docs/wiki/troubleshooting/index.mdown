@@ -1,0 +1,16 @@
+Troubleshooting
+===============
+
+If things don't go smoothly, the first thing to do is run the tests to see if they can determine what's wrong.  To enable the tests you'll need to add django-hoptoad to your `INSTALLED_APPS` setting:
+
+    INSTALLED_APPS = (
+        # ... other apps ...
+        'hoptoad',
+        # ... other apps ...
+    )
+
+Once you've done that you can run the unit tests:
+
+    python manage.py test hoptoad
+
+**NOTE**: The unit tests are very simple at the moment.  I'm working on more, but please feel free to submit ideas (or better yet: patches).

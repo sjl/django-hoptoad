@@ -1,0 +1,30 @@
+django-hoptoad
+==============
+
+`django-hoptoad` is some simple Middleware for letting [Django][]-driven websites report their errors to [Hoptoad][].  Now [ponies][] can ride the toad too.
+
+[Django]: http://djangoproject.com/
+[Hoptoad]: http://hoptoadapp.com/
+[ponies]: http://djangopony.com/
+
+[Installation][]
+----------------
+
+[Quick Start][]
+---------------
+
+[Configuration][]
+-----------------
+
+[Troubleshooting][]
+-------------------
+
+[Code][]
+--------
+
+[Installation]: /installation/
+[Quick Start]: /quickstart/
+[Configuration]: /config/
+[Troubleshooting]: /troubleshooting/
+[Code]: http://bitbucket.org/sjl/django-hoptoad/
+

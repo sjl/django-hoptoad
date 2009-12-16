@@ -1,0 +1,15 @@
+wiki-name: "django-hoptoad"
+
+static-dir: "static"
+
+hide-prefix: "."
+document-extensions: [.md, .mdown, .markdown]
+generate-listing: always
+listing-filename: "list.html"
+
+use-default-static: false
+
+markdown:
+  safe_mode: false
+  output_format: xhtml1
+  extensions: [codehilite, def_list, toc]
