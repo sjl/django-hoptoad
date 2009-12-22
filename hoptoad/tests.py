@@ -7,7 +7,7 @@ class BasicTests(TestCase):
     
     def test_api_key_present(self):
         """Test to make sure an API key is present."""
-        self.assertTrue('HOPTOAD_API_KEY' in dir(settings)
+        self.assertTrue('HOPTOAD_API_KEY' in dir(settings),
             msg='The HOPTOAD_API_KEY setting is not present.')
         self.assertTrue(settings.HOPTOAD_API_KEY,
             msg='The HOPTOAD_API_KEY setting is blank.')
