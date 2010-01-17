@@ -1,0 +1,42 @@
+Installation
+============
+
+django-hoptoad requires:
+
+* [Python][] 2.5+ (preferably 2.6+ as that's what I've tested it with)
+* [PyYAML][] (`pip install pyyaml` or `easy_install pyyaml`)
+* [Django][] 1.0+
+* A [Hoptoad][] account
+
+[Python]: http://python.org/
+[PyYAML]: http://pyyaml.org/
+[Django]: http://djangoproject.com/
+[Hoptoad]: http://hoptoadapp.com/
+
+Grab the the `django-hoptoad` code by cloning the [Mercurial][] repository (or just [download the latest version][tip-dl] and unzip it somewhere):
+
+    hg clone http://bitbucket.org/sjl/django-hoptoad/
+
+There's a git mirror too if you *really* want it.
+
+    git clone git://github.com/sjl/django-hoptoad.git
+
+Once you download it, you can install it in the usual manner:
+
+    cd django-hoptoad
+    python setup.py install
+
+If you'd prefer to be able to update at any time by pulling down changes with Mercurial or git, you can symlink the module into your `site-packages` directory instead of using `python setup.py install`:
+
+    ln -s /full/path/to/django-hoptoad/hoptoad /full/path/to/site-packages/
+
+To make sure it works you can run:
+
+    python -c 'import hoptoad'
+
+[Mercurial]: http://mercurial.selenic.com/
+[tip-dl]: http://bitbucket.org/sjl/django-hoptoad/get/tip.zip
+
+Take a look at the [Quick Start][] guide to learn how to report your Django project's errors to Hoptoad.
+
+[Quick Start]: /quickstart/
