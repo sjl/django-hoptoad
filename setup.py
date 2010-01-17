@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-hoptoad',
-    version='0.2',
+    version='0.3',
     description='django-hoptoad is some simple Middleware for letting Django-driven websites report their errors to Hoptoad.',
     long_description=open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.rst')).read(),
     author='Steve Losh',
