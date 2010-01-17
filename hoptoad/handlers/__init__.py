@@ -6,8 +6,8 @@ import logging
 from hoptoad import get_hoptoad_settings
 from hoptoad.handlers.threaded import ThreadedNotifier
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 def get_handler(*args, **kwargs):
     """Returns an initialized handler object"""
