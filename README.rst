@@ -14,13 +14,11 @@ Requirements
 
 django-hoptoad requires:
 
-* Python_ 2.5+ (preferably 2.6+ as that's what I've tested it with)
-* PyYAML_ (`pip install pyyaml` or `easy_install pyyaml`)
+* Python_ 2.6
 * Django_ 1.0+
 * A Hoptoad_ account
 
 .. _Python: http://python.org/
-.. _PyYAML: http://pyyaml.org/
 
 
 Installation
@@ -65,6 +63,32 @@ First, add the ``HoptoadNotifierMiddleware`` as the last item in the ``MIDDLEWAR
 Next, you'll need to add a ``HOPTOAD_API_KEY`` setting.  You can get the key from the Hoptoad project page::
 
     HOPTOAD_API_KEY = 'Your Hoptoad API key.'
+
+
+Advanced-Usage
+--------------
+
+There are more advanced options that can be used to customize your Hoptoad_ application::
+
+    - HOPTOAD_NOTIFY_WHILE_DEBUG
+
+    - HOPTOAD_NOTIFY_403
+
+    - HOPTOAD_NOTIFY_404
+
+    - HOPTOAD_IGNORE_AGENTS
+
+    - HOPTOAD_HANDLER
+
+    - HOPTOAD_TIMEOUT
+
+    - HOPTOAD_NOTIFICATION_URL
+
+    - HOPTOAD_THREAD_COUNT
+
+If you feel that you might be cluttering your settings.py with all these ``HOPTOAD_*`` settings, you can conveniently group them in a dictionary::
+
+    - HOPTOAD_SETTINGS 
 
 
 Documentation

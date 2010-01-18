@@ -4,3 +4,4 @@ syntax: glob
 *.swp
 *.swo
 .DS_Store
+.git*
