@@ -118,8 +118,25 @@ There are a few handlers to choose from, (i.e. possible `HOPTOAD_HANDLER` settin
 Over time, there will be more custom handlers with various options to control them.
 
 What if you do not want to use any of the default handlers, but instead, use your own proprietary system?
+----------------------------------------------------- ---------------------------------------------------
 
-There is support for drop-in replacements of handlers so that you might write your own custom handler. More documentation on this to follow.
+There is support for drop-in replacements of handlers so that you might write your own custom handler. It's actually quite simple. All that's needed is that you implement a class, that implements an `enqueue` method which takes two parameters, `payload`, and `timeout`. You also have to import the api that's needed to report.
+
+For example, consider the following class below:
+
+    from hoptoad.api import htv2
+
+    class SomeAwesomeReportingMethod(object):
+        def enqueue(self, payload, timeout):
+            """This enqueue method is your own implementation"""
+            htv2.report(payload, timeout)
+
+You would need to also to set two variables in `settings.py`:
+
+    HOPTOAD_HANDLER = "/path/to/the/custom/implementation.py"
+    HOPTOAD_HANDLER_CLASS = "SomeAwesomeReport"
+
+As you can see, `HOPTOAD_HANDLER` is the file location to the implementation of the custom handler and `HOPTOAD_HANDLER_CLASS` is the name of the actual class that implements the enqueue method.
 
 Hoptoad Notification URL
 ------------------------
