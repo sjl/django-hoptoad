@@ -66,7 +66,7 @@ class HoptoadNotifierMiddleware(object):
 
         sc = response.status_code
         if sc in [404, 403] and getattr(self, "notify_%d" % sc):
-            self.handler.enqueue(htv2.generate_payload(request, response=sc),
+            self.handler.enqueue(htv2.generate_payload((request, sc)),
                                  self.timeout)
 
         return response
@@ -82,7 +82,7 @@ class HoptoadNotifierMiddleware(object):
         if self._ignore(request):
             return None
 
-        self.handler.enqueue(htv2.generate_payload(request, exc=exc),
+        self.handler.enqueue(htv2.generate_payload((request, None)),
                              self.timeout)
         return None
 

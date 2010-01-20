@@ -68,28 +68,7 @@ Next, you'll need to add a ``HOPTOAD_API_KEY`` setting.  You can get the key fro
 Advanced-Usage
 --------------
 
-There are more advanced options that can be used to customize your Hoptoad_ application::
-
-    - HOPTOAD_NOTIFY_WHILE_DEBUG
-
-    - HOPTOAD_NOTIFY_403
-
-    - HOPTOAD_NOTIFY_404
-
-    - HOPTOAD_IGNORE_AGENTS
-
-    - HOPTOAD_HANDLER
-
-    - HOPTOAD_TIMEOUT
-
-    - HOPTOAD_NOTIFICATION_URL
-
-    - HOPTOAD_THREAD_COUNT
-
-If you feel that you might be cluttering your settings.py with all these ``HOPTOAD_*`` settings, you can conveniently group them in a dictionary::
-
-    - HOPTOAD_SETTINGS 
-
+There are more advanced options that can be used to customize your Hoptoad_ notification process; please go to `Configuration guide <http://sjl.bitbucket.org/django-hoptoad/config/>`_ to see more advanced configuration and usage options.
 
 Documentation
 -------------
