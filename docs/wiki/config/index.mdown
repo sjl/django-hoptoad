@@ -109,16 +109,16 @@ This variable is set to "threadpool" by default.
 
 There are a few handlers to choose from, (i.e. possible `HOPTOAD_HANDLER` settings):
 
-### "threadpool" 
+#### "threadpool" 
 > This is the default setting. Will return a daemonized thread with a 4 worker-thread thread pool to handle all enqueued errors.
 
-### "blocking" 
+#### "blocking" 
 > This will switch from the thread pool approach to a blocking HTTP POST where the entire Django process is halted until this blocking call returns.
 
 Over time, there will be more custom handlers with various options to control them.
 
 What if you do not want to use any of the default handlers, but instead, use your own proprietary system?
------------------------------------------------------ ---------------------------------------------------
+---------------------------------------------------------------------------------------------------------
 
 There is support for drop-in replacements of handlers so that you might write your own custom handler. It's actually quite simple. All that's needed is that you implement a class, that implements an `enqueue` method which takes two parameters, `payload`, and `timeout`. You also have to import the api that's needed to report.
 
@@ -126,7 +126,7 @@ For example, consider the following class below:
 
     from hoptoad.api import htv2
 
-    class SomeAwesomeReportingMethod(object):
+    class SomeAwesomeReporting(object):
         def enqueue(self, payload, timeout):
             """This enqueue method is your own implementation"""
             htv2.report(payload, timeout)
