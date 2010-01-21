@@ -77,31 +77,29 @@ This would probably be a good starting point for ignoring crawlers:
 
     HOPTOAD_IGNORE_AGENTS = ['Googlebot', 'Yahoo! Slurp', 'YahooSeeker']
 
-Using SSL to POST to Hoptoad
-----------------------------
+Use SSL to POST to Hoptoad
+--------------------------
 
-If you desire to use SSL and your account plan supports it, then you can use the following setting to enable SSL POSTs:
+If you want to use SSL (and your account plan supports it) you can use the following setting to enable SSL POSTs:
 
     HOPTOAD_USE_SSL = True
 
-This will force all HTTP requests to use SSL. There's always a possibility, due to either an account downgrade, or, an expiration of a SSL certificate that Hoptoad might return an error code of `402` on a POST. There is built-in support automatically to try to re-POST the same error message without using SSL. To enable this feature, just add this option as well:
+This will force all HTTP requests to use SSL. There's always a possibility, due to either an account downgrade, or, an expiration of a SSL certificate that Hoptoad might return an error code of `402` on a POST. There is built-in support automatically to try to re-POST the same error message without using SSL. To enable this feature, just add this option:
 
     HOPTOAD_NO_SSL_FALLBACK = True
 
-This will force a fallback to a non-SSL HTTP post to Hoptoad.
+This will force a fallback to a non-SSL HTTP post to Hoptoad if the SSL post fails.
 
 Asynchronous POSTs and Request Handlers
 ---------------------------------------
 
-On a highly trafficked website, there is a noticeable degree of a delay when POST'ing to hoptoad -- either due to error limitations, network instability, or other acts of God that can cause an HTTP request to slow down or fail. To fix this, django-hoptoad will spawn a daemon thread, by default, that will spawn a thread pool, with 4 threads, to queue up all errors for maximum throughput. However, this can be configured to your heart's content, including changing the notification handler completely. 
+On a highly trafficked website there is a noticeable degree of a delay when POST'ing to Hoptoad -- either due to error limitations, network instability, or other acts of God that can cause an HTTP request to slow down or fail. To fix this, django-hoptoad will spawn a daemon thread by default.  It will spawn a thread pool (with 4 threads) to queue up all errors for maximum throughput. However, this can be configured to your heart's content, including changing the notification handler completely. 
 
-To control the number of threads spawned per threadpool, you can set the following variable to your desired thread count per threadpool:
+To change the number of threads spawned per threadpool from the default of 4, you can set the following variable to your desired thread count per threadpool:
 
     HOPTOAD_THREAD_COUNT = 2
 
-In django-hoptoad, this variable defaults to 4.
-
-There is also built-in support for various other methods of communicating **synchronously** with Hoptoad, and that requires just one more setting:
+There is also built-in support for various other methods of communicating **synchronously** with Hoptoad:
 
     HOPTOAD_HANDLER = "blocking"
 
@@ -109,55 +107,57 @@ This variable is set to "threadpool" by default.
 
 There are a few handlers to choose from, (i.e. possible `HOPTOAD_HANDLER` settings):
 
-#### "threadpool" 
-> This is the default setting. Will return a daemonized thread with a 4 worker-thread thread pool to handle all enqueued errors.
+### "threadpool" 
 
-#### "blocking" 
-> This will switch from the thread pool approach to a blocking HTTP POST where the entire Django process is halted until this blocking call returns.
+This is the default setting. Will return a daemonized thread with a 4 worker-thread thread pool to handle all enqueued errors.
 
-Over time, there will be more custom handlers with various options to control them.
+### "blocking" 
 
-What if you do not want to use any of the default handlers, but instead, use your own proprietary system?
----------------------------------------------------------------------------------------------------------
+This will switch from the thread pool approach to a blocking HTTP POST where the entire Django process is halted until this blocking call returns.
 
-There is support for drop-in replacements of handlers so that you might write your own custom handler. It's actually quite simple. All that's needed is that you implement a class, that implements an `enqueue` method which takes two parameters, `payload`, and `timeout`. You also have to import the api that's needed to report.
+Over time there will be more custom handlers with various options to control them.
 
-For example, consider the following class below:
+Writing and Using Custom Handlers
+---------------------------------
+
+There is support for drop-in replacements of handlers so that you can write your own. All you need to do is implement a class which implements an `enqueue` method, which takes two parameters: `payload` and `timeout`. You'll also need to import the API that's needed to report.
+
+For example:
 
     from hoptoad.api import htv2
-
+    
     class SomeAwesomeReporting(object):
         def enqueue(self, payload, timeout):
             """This enqueue method is your own implementation"""
             htv2.report(payload, timeout)
 
-You would need to also to set two variables in `settings.py`:
+You'll need set two variables in `settings.py` to use your custom handler:
 
     HOPTOAD_HANDLER = "/path/to/the/custom/implementation.py"
     HOPTOAD_HANDLER_CLASS = "SomeAwesomeReport"
 
-As you can see, `HOPTOAD_HANDLER` is the file location to the implementation of the custom handler and `HOPTOAD_HANDLER_CLASS` is the name of the actual class that implements the enqueue method.
+`HOPTOAD_HANDLER` is the file location to the module that contains your implementation of the custom handler and `HOPTOAD_HANDLER_CLASS` is the name of the actual handler class.
 
-Hoptoad Notification URL
-------------------------
+Change the Hoptoad Notification URL
+-----------------------------------
 
-Currently, Hoptoad has their notification URLs pointed to `http://hoptoadapp.com/notifier_api/v2/notices`, but this has been the second time that this was changed. It, therefore, can be expected that this will change again, so it is configurable like so:
+Currently Hoptoad has their notification API at `http://hoptoadapp.com/notifier_api/v2/notices`, but this has been the second time that this was changed.  It may change again, so it's configurable (in case you want to fix the problem before we have a chance to update django-hoptoad with the new URL):
 
     HOPTOAD_NOTIFICATION_URL = "Hoptoad Notification URL here."
 
 This defaults to `http://hoptoadapp.com/notifier_api/v2/notices`.
 
-Hoptoad Setting Groupings
--------------------------
+Group django-hoptoad Settings
+-----------------------------
 
-As you've probably noticed, these hoptoad settings are getting to be extremely abundant, so in order to give you some organization support for your `settings.py`, we've included support for grouping them in a dictionary. You can group them using `HOPTOAD_SETTINGS` as a dictionary and django-hoptoad will have support for this:
+As you've probably noticed, these django-hoptoad settings are getting to be extremely abundant, so in order to give you some organization support for your `settings.py`, we've included support for grouping them in a dictionary. You can group them using `HOPTOAD_SETTINGS` as a dictionary:
 
     HOPTOAD_SETTINGS = { 
-            'HOPTOAD_API_KEY' : 'a3eer..'
+            'HOPTOAD_API_KEY' : 'abc12345...'
             'HOPTOAD_HANDLER' : 'threadpool',
             'HOPTOAD_THREAD_COUNT' : 2,
             'HOPTOAD_USE_SSL' : True,
-            # etc, you get the point
+            # ...
      }
 
 
