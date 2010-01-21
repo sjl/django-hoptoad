@@ -9,11 +9,10 @@ setup(
     description='django-hoptoad is some simple Middleware for letting '
                 'Django-driven websites report their errors to Hoptoad.',
     long_description=open(README_PATH).read(),
-    author='Steve Losh',
-    author_email='steve@stevelosh.com',
+    author='Steve Losh, Mahmoud Abdelkader',
+    author_email='steve@stevelosh.com, mahmoud@linux.com',
     url='http://sjl.bitbucket.org/django-hoptoad/',
     packages=find_packages(),
-    install_requires=['pyyaml'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

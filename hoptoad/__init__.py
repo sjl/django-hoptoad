@@ -1,4 +1,5 @@
 from django.conf import settings
+from itertools import ifilter
 
 
 __version__ = 0.3
@@ -13,7 +14,9 @@ def get_hoptoad_settings():
     if not hoptoad_settings:
         # do some backward compatibility work to combine all hoptoad
         # settings in a dictionary
-        for attr in filter(lambda a: a.startswith('HOPTOAD'), dir(settings)):
+        
+        # for every attribute that starts with hoptoad
+        for attr in ifilter(lambda x: x.startswith('HOPTOAD'), dir(settings)):
             hoptoad_settings[attr] = getattr(settings, attr)
         
         if not hoptoad_settings:

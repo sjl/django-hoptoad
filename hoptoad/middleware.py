@@ -36,7 +36,10 @@ class HoptoadNotifierMiddleware(object):
         self.handler = get_handler()
     
     def _ignore(self, request):
-        """Return True if the given request should be ignored, False otherwise."""
+        """Return True if the given request should be ignored,
+        False otherwise.
+
+        """
         ua = request.META.get('HTTP_USER_AGENT', '')
         return any(i.search(ua) for i in self.ignore_agents)
     
@@ -58,7 +61,7 @@ class HoptoadNotifierMiddleware(object):
         
         sc = response.status_code
         if sc in [404, 403] and getattr(self, "notify_%d" % sc):
-            self.handler.enqueue(htv2.generate_payload(request, response=sc),
+            self.handler.enqueue(htv2.generate_payload((request, sc)),
                                  self.timeout)
         
         return response
@@ -71,7 +74,11 @@ class HoptoadNotifierMiddleware(object):
         be used.
         
         """
-        if not self._ignore(request):
-            self.handler.enqueue(htv2.generate_payload(request, exc=exc),
-                                 self.timeout)
+        if self._ignore(request):
+            return None
+        
+        self.handler.enqueue(htv2.generate_payload((request, None)),
+                             self.timeout)
+        return None
     
+

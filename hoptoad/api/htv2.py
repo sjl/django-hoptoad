@@ -1,7 +1,6 @@
 import sys
 import traceback
 import urllib2
-import yaml
 from xml.dom.minidom import getDOMImplementation
 
 from django.views.debug import get_safe_settings
@@ -16,7 +15,7 @@ from hoptoad.api.htv1 import _parse_message
 def _class_name(class_):
     return class_.__class__.__name__
 
-def _handle_errors(request, response, exc):
+def _handle_errors(request, response):
     if response:
         code = "Http%s" % response
         msg = "%(code)s: %(response)s at %(uri)s" % {
@@ -27,21 +26,22 @@ def _handle_errors(request, response, exc):
         }
         return (code, msg)
     
-    excc, inst = sys.exc_info()[:2]
-    if exc:
-        excc = exc
-    return _class_name(excc), _parse_message(excc)
+    exc, inst = sys.exc_info()[:2]
+    return _class_name(inst), _parse_message(inst)
 
 
-def generate_payload(request, response=None, exc=None):
+def generate_payload(request_tuple):
     """Generate an XML payload for a Hoptoad notification.
     
     Parameters:
-    request -- A Django HTTPRequest.
     
+    request_tuple -- A tuple containing a Django HTTPRequest and a possible
+                     response code.
     """
+    request, response = request_tuple
     hoptoad_settings = get_hoptoad_settings()
-    p_error_class, p_message = _handle_errors(request, response, exc)
+    
+    p_error_class, p_message = _handle_errors(request, response)
     
     # api v2 from: http://help.hoptoadapp.com/faqs/api-2/notifier-api-v2
     xdoc = getDOMImplementation().createDocument(None, "notice", None)
@@ -187,6 +187,7 @@ def _ride_the_toad(payload, timeout, use_ssl):
                                                    notification_url)
     
     r = urllib2.Request(notification_url, payload, headers)
+
     try:
         if timeout:
             # timeout is 2.6 addition!
@@ -196,12 +197,17 @@ def _ride_the_toad(payload, timeout, use_ssl):
     except urllib2.URLError:
         pass
     else:
-        # getcode is 2.6 addition!
-        status = response.getcode()
+        try:
+            # getcode is 2.6 addition!!
+            status = response.getcode()
+        except AttributeError:
+            # default to just code
+            status = response.code
         
         if status == 403 and use_ssl:
-            # if we can not use SSL, re-invoke w/o using SSL
-            _ride_the_toad(payload, timeout, use_ssl=False)
+            if get_hoptoad_settings().get('HOPTOAD_NO_SSL_FALLBACK', False):
+                # if we can not use SSL, re-invoke w/o using SSL
+                _ride_the_toad(payload, timeout, use_ssl=False)
         if status == 403 and not use_ssl:
             # we were not trying to use SSL but got a 403 anyway
             # something else must be wrong (bad API key?)

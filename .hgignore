@@ -4,6 +4,6 @@ syntax: glob
 *.swp
 *.swo
 .DS_Store
-
 docs/.html
 docs/.tmp
+.git*
