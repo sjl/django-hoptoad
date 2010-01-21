@@ -78,13 +78,24 @@ def generate_payload(request_tuple):
     
     # /notice/error/backtrace/error/line
     backtrace = xdoc.createElement('backtrace')
+    
     # i do this here because I'm afraid of circular reference..
-    reversed_backtrace = reversed(traceback.extract_tb(sys.exc_info()[2]))
-    for filename, lineno, funcname, text in reversed_backtrace:
+    reversed_backtrace = list(
+        reversed(traceback.extract_tb(sys.exc_info()[2]))
+    )
+    
+    if reversed_backtrace:
+        for filename, lineno, funcname, text in reversed_backtrace:
+            line = xdoc.createElement('line')
+            line.setAttribute('file', str(filename))
+            line.setAttribute('number', str(lineno))
+            line.setAttribute('method', str(funcname))
+            backtrace.appendChild(line)
+    else:
         line = xdoc.createElement('line')
-        line.setAttribute('file', str(filename))
-        line.setAttribute('number', str(lineno))
-        line.setAttribute('method', str(funcname))
+        line.setAttribute('file', 'unknown')
+        line.setAttribute('number', '0')
+        line.setAttribute('method', 'unknown')
         backtrace.appendChild(line)
     error.appendChild(backtrace)
     notice.appendChild(error)
@@ -117,14 +128,16 @@ def generate_payload(request_tuple):
     #xrequest.appendChild(action)
     
     # /notice/request/params/var -- check request.GET/request.POST
-    params = xdoc.createElement('params')
-    for key, value in _parse_request(request).iteritems():
-        var = xdoc.createElement('var')
-        var.setAttribute('key', key)
-        value = xdoc.createTextNode(str(value))
-        var.appendChild(value)
-        params.appendChild(var)
-    xrequest.appendChild(params)
+    req_params = _parse_request(request).items()
+    if req_params:
+        params = xdoc.createElement('params')
+        for key, value in req_params:
+            var = xdoc.createElement('var')
+            var.setAttribute('key', key)
+            value = xdoc.createTextNode(str(value))
+            var.appendChild(value)
+            params.appendChild(var)
+        xrequest.appendChild(params)
     
     # /notice/request/session/var -- check if sessions is enabled..
     sessions = xdoc.createElement('session')
@@ -134,7 +147,7 @@ def generate_payload(request_tuple):
         value = xdoc.createTextNode(str(value))
         var.appendChild(value)
         sessions.appendChild(var)
-    xrequest.appendChild(params)
+    xrequest.appendChild(sessions)
     
     # /notice/request/cgi-data/var -- all meta data
     cgidata = xdoc.createElement('cgi-data')
@@ -156,15 +169,15 @@ def generate_payload(request_tuple):
     serverenv.appendChild(projectroot)
     
     # /notice/server-environment/environment-name -- environment name? wtf..
-    #envname = xdoc.createElement('environment-name')
+    envname = xdoc.createElement('environment-name')
     # no idea...
     
     # sjl: This is supposed to be set to something like "test", "staging",
     #      or "production" to help you group the errors in the web interface.
     #      I'm still thinking about the best way to support this.
     
-    # envname.appendChild(xdoc.createTextNode())
-    #serverenv.appendChild(envname)
+    envname.appendChild(xdoc.createTextNode('unknown'))
+    serverenv.appendChild(envname)
     notice.appendChild(serverenv)
     
     return xdoc.toxml('utf-8')
@@ -187,14 +200,13 @@ def _ride_the_toad(payload, timeout, use_ssl):
                                                    notification_url)
     
     r = urllib2.Request(notification_url, payload, headers)
-
     try:
         if timeout:
             # timeout is 2.6 addition!
             response = urllib2.urlopen(r, timeout=timeout)
         else:
             response = urllib2.urlopen(r)
-    except urllib2.URLError:
+    except urllib2.URLError, err:
         pass
     else:
         try:
