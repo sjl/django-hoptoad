@@ -5,6 +5,10 @@ import yaml
 from django.views.debug import get_safe_settings
 from django.conf import settings
 
+from hoptoad import get_hoptoad_settings
+
+
+PROTECTED_PARAMS = frozenset(get_hoptoad_settings().get('HOPTOAD_PROTECTED_PARAMS', []))
 
 def _parse_environment(request):
     """Return an environment mapping for a notification from the given request."""
@@ -32,7 +36,12 @@ def _parse_request(request):
     """Return a request mapping for a notification from the given request."""
     request_get = dict( (str(k), str(v)) for (k, v) in request.GET.items() )
     request_post = dict( (str(k), str(v)) for (k, v) in request.POST.items() )
-    return request_post if request_post else request_get
+    
+    data = request_post or request_get
+    for k in PROTECTED_PARAMS.intersection(data.keys()):
+        data[k] = '********************'
+    
+    return data
 
 def _parse_session(session):
     """Return a request mapping for a notification from the given session."""

@@ -90,6 +90,19 @@ This will force all HTTP requests to use SSL. There's always a possibility, due 
 
 This will force a fallback to a non-SSL HTTP post to Hoptoad if the SSL post fails.
 
+Hide Sensitive Request Parameters
+---------------------------------
+
+If a user submits important data (credit card numbers, for example) with a GET
+or POST request and an error occurs, that data will be passed along to
+Hoptoad. If you want to blank out the contents of certain parameters you can
+use this option:
+
+    HOPTOAD_PROTECTED_PARAMS = ['credit_card_number', 'ssn']
+
+Any parameter in this list will have its contents replaced with
+`********************` before it is sent to Hoptoad.
+
 Asynchronous POSTs and Request Handlers
 ---------------------------------------
 
