@@ -176,7 +176,16 @@ def generate_payload(request_tuple):
     #      or "production" to help you group the errors in the web interface.
     #      I'm still thinking about the best way to support this.
     
-    envname.appendChild(xdoc.createTextNode('unknown'))
+    # bmjames: Taking this from a settings variable. I personally have a
+    #          different settings.py for every environment and my deploy
+    #          script puts the correct one in place, so this makes sense.
+    #          But even if one had a single settings.py shared among
+    #          environments, it should be possible to set this variable
+    #          dynamically. It would simply be the responsibility of
+    #          settings.py to do it, rather than the hoptoad middleware.
+
+    envname_data = xdoc.createTextNode(hoptoad_settings['HOPTOAD_ENV_NAME'])
+    envname.appendChild(envname_data)
     serverenv.appendChild(envname)
     notice.appendChild(serverenv)
     
