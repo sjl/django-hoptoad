@@ -12,6 +12,24 @@ By default the Middleware will **not** report errors to Hoptoad when your projec
 
     HOPTOAD_NOTIFY_WHILE_DEBUG = True
 
+Specify an Environment Name
+---------------------------
+
+If your application is deployed in multiple places, an environment name distinguishes production servers from QA or staging servers, so you know which server the error was produced on. Hoptoad's API seems to accept any environment name, but typical examples would be 'Production', 'QA', 'Test', 'Development'. If you have one `settings.py` per environment, you can set this quite simply:
+
+    HOPTOAD_ENV_NAME = 'Production'
+
+If you have a single `settings.py` shared between environments, you may want to set this in a more dynamic fashion. There's no limit (other than Python itself) on how to do this. For example:
+
+    HOPTOAD_ENV_NAME = 'Test' if DEBUG else 'Production'
+
+Or:
+
+    import platform
+    HOPTOAD_ENV_NAME = platform.node()
+
+If `HOPTOAD_ENV_NAME` is not set, the Middleware by default will send the environment name as 'Unknown'.
+
 Specify a Default Timeout
 -------------------------
 
