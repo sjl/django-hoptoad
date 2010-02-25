@@ -184,10 +184,7 @@ def generate_payload(request_tuple):
     #          dynamically. It would simply be the responsibility of
     #          settings.py to do it, rather than the hoptoad middleware.
 
-    try:
-        envname_text = hoptoad_settings['HOPTOAD_ENV_NAME']
-    except KeyError:
-        envname_text = 'Unknown'
+    envname_text = hoptoad_settings.get('HOPTOAD_ENV_NAME', 'Unknown')
     envname_data = xdoc.createTextNode(envname_text)
     envname.appendChild(envname_data)
     serverenv.appendChild(envname)
