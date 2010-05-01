@@ -14,13 +14,11 @@ Requirements
 
 django-hoptoad requires:
 
-* Python_ 2.5+ (preferably 2.6+ as that's what I've tested it with)
-* PyYAML_ (`pip install pyyaml` or `easy_install pyyaml`)
+* Python_ 2.6
 * Django_ 1.0+
 * A Hoptoad_ account
 
 .. _Python: http://python.org/
-.. _PyYAML: http://pyyaml.org/
 
 
 Installation
@@ -66,6 +64,11 @@ Next, you'll need to add a ``HOPTOAD_API_KEY`` setting.  You can get the key fro
 
     HOPTOAD_API_KEY = 'Your Hoptoad API key.'
 
+
+Advanced-Usage
+--------------
+
+There are more advanced options that can be used to customize your Hoptoad_ notification process; please go to `Configuration guide <http://sjl.bitbucket.org/django-hoptoad/config/>`_ to see more advanced configuration and usage options.
 
 Documentation
 -------------
