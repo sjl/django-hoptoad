@@ -34,10 +34,19 @@ def _parse_message(exc):
 
 def _parse_request(request):
     """Return a request mapping for a notification from the given request."""
-    request_get = dict( (str(k), str(v)) for (k, v) in request.GET.items() )
-    request_post = dict( (str(k), str(v)) for (k, v) in request.POST.items() )
-    
-    data = request_post or request_get
+    data = []
+    for (k, v) in request.POST.items():
+        try:
+            data.append((str(k), str(v)))
+        except UnicodeEncodeError:
+            data.append((str(k), repr(v)))
+    if not data:
+        for (k, v) in request.GET.items():
+            try:
+                data.append((str(k), str(v)))
+            except UnicodeEncodeError:
+                data.append((str(k), repr(v)))
+    data = dict(data)
     for k in PROTECTED_PARAMS.intersection(data.keys()):
         data[k] = '********************'
     
